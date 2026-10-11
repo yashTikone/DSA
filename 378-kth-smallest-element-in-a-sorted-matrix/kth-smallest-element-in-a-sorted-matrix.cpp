@@ -1,38 +1,43 @@
 class Solution {
 public:
-    int func(vector<vector<int>>& matrix,int n , int m, int guess){
-        int row = n-1;
-        int column = 0;
-        int count = 0;
-        while(row>=0 && column<m){
-            if(matrix[row][column]<=guess){
-                count += row + 1;
-                column++;
-            }
-            else{
-                row--;
-            }
+    class Node{
+        public:
+        int value;
+        int row;
+        int col;
+        Node(int v,int r, int c){
+            value = v;
+            row = r;
+            col = c;
         }
-        return count;
-    }
+
+    };
+    struct cmp{
+        bool operator() (const Node&a, const Node&b) const{
+            return a.value > b.value;
+        }
+    };
     int kthSmallest(vector<vector<int>>& matrix, int k) {
         int n = matrix.size();
         int m = matrix[0].size();
-        int low = matrix[0][0];
-        int high = matrix[n-1][m-1];
-        int res = -1;
-        while(low<=high){
-            int guess = (low+high)/2;
-            int ans = func(matrix,n,m,guess);
-            if(ans<k){
-                low = guess+1;
-            }
-            else{
-                res = guess;
-                high = guess-1;
-            }
-
+        priority_queue <Node, vector<Node>, cmp> pq;
+        for(int i=0;i<n;i++){
+            pq.push({matrix[i][0],i,0});
         }
-        return res;
+        vector<int> res;
+        while(!pq.empty()){
+            Node n = pq.top();
+            pq.pop();
+            int v = n.value;
+            int row = n.row;
+            int col = n.col;
+            res.push_back(v);
+            if(col<(m-1)){
+                pq.push({matrix[row][col+1],row,col+1});
+            }
+        }
+        return res[k-1];
+
+        
     }
 };
